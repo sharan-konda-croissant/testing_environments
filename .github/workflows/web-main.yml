@@ -37,26 +37,26 @@ jobs:
                   path: sample.txt
                   retention-days: 1
     
-    manual_approval:
+    # manual_approval:
 
-        name: Request Manual Approval
-        runs-on: ubuntu-latest
-        permissions:
-            issues: write
-            id-token: write
-            contents: read
-        needs: test_and_report
-        steps:
-            - name: Awaiting Manual Approval
-              uses: trstringer/manual-approval@v1.9.1
-              timeout-minutes: 30
-              with:
-                secret: ${{ github.TOKEN }}
-                approvers: sharan-konda-croissant
-                minimum-approvals: 1
-                issue-title: "Pushing Screenshots to S3"
-                issue-body: "Please approve or deny the deployment to push the baseline screenshot artifact to S3"
-                exclude-workflow-initiator-as-approver: false
+    #     name: Request Manual Approval
+    #     runs-on: ubuntu-latest
+    #     permissions:
+    #         issues: write
+    #         id-token: write
+    #         contents: read
+    #     needs: test_and_report
+    #     steps:
+    #         - name: Awaiting Manual Approval
+    #           uses: trstringer/manual-approval@v1.9.1
+    #           timeout-minutes: 30
+    #           with:
+    #             secret: ${{ github.TOKEN }}
+    #             approvers: sharan-konda-croissant
+    #             minimum-approvals: 1
+    #             issue-title: "Pushing Screenshots to S3"
+    #             issue-body: "Please approve or deny the deployment to push the baseline screenshot artifact to S3"
+    #             exclude-workflow-initiator-as-approver: false
     
     upload_to_s3:
         name: Upload to S3
@@ -82,7 +82,7 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: test-report
-                  path: sample.txt
+                  path: ./
 
             - name: Upload Screenshots to S3
               run: |
