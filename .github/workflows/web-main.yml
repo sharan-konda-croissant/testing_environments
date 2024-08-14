@@ -80,5 +80,5 @@ jobs:
 
             - name: Upload Screenshots to S3
               env:
-                run: |
+              run: |
                 cat sample.txt
