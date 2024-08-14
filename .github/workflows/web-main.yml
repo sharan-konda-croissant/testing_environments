@@ -43,9 +43,8 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             issues: write
-            pull-requests: write
             id-token: write
-            contents: write
+            contents: read
         needs: test_and_report
         steps:
             - name: Awaiting Manual Approval
@@ -64,9 +63,9 @@ jobs:
         environment: main
         timeout-minutes: 60
         permissions:
-            pull-requests: write
+            action: read
             id-token: write
-            contents: write
+            content: read
         runs-on: ubuntu-latest
         strategy:
             matrix:
