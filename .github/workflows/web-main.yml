@@ -38,8 +38,13 @@ jobs:
                   retention-days: 1
     
     manual_approval:
+
         name: Request Manual Approval
         runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+            id-token: write
+            contents: write
         needs: test_and_report
         steps:
             - name: Awaiting Manual Approval
