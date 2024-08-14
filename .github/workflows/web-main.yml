@@ -42,6 +42,7 @@ jobs:
         name: Request Manual Approval
         runs-on: ubuntu-latest
         permissions:
+            issues: write
             pull-requests: write
             id-token: write
             contents: write
