@@ -26,30 +26,59 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
             
+            - name: Generate a sample file
+              run: echo "Hello Sharan Reddy" > sample.txt
+
             - name: Generate Test Reports Artifact
               uses: actions/upload-artifact@v4
               if: always()
               with:
                   name: test-report
-                  path: Readme.md
+                  path: sample.txt
                   retention-days: 1
     
-    push_screenshots_on_approval:
-        name: Push Screenshots On Approval
+    manual_approval:
+        name: Request Manual Approval
         runs-on: ubuntu-latest
         needs: test_and_report
-        environment: Sandbox
+        steps:
+            - name: Awaiting Manual Approval
+              uses: trstringer/manual-approval@v1.9.1
+              with:
+                secret: ${{ github.TOKEN }}
+                approvers: sharan-konda-croissant
+                minimum-approvals: 1
+                issue-title: "Pushing Screenshots to S3"
+                issue-body: "Please approve or deny the deployment to push the baseline screenshot artifact to S3"
+                exclude-workflow-initiator-as-approver: false
+    
+    upload_to_s3:
+        name: Upload to S3
+        needs: manual_approval
+        environment: main
         timeout-minutes: 60
+        permissions:
+            pull-requests: write
+            id-token: write
+            contents: write
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x]
         env:
             CI: true
         steps:
-            - name: Download Artifact
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+            
+            - name: Download Web Snapshots Artifact
               uses: actions/download-artifact@v4
               with:
-                name: test-report
-                path: ./
-                
-            - name: Upload Artifact on Approval
-              run: |
-                echo "Uploading the artifact now"
-                cat Readme.md
+                  name: test-report
+                  path: Readme.md
+
+            - name: Upload Screenshots to S3
+              env:
+                run: |
+                cat sample.txt
