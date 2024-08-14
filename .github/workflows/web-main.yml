@@ -49,6 +49,7 @@ jobs:
         steps:
             - name: Awaiting Manual Approval
               uses: trstringer/manual-approval@v1.9.1
+              timeout-minutes: 30
               with:
                 secret: ${{ github.TOKEN }}
                 approvers: sharan-konda-croissant
@@ -63,9 +64,9 @@ jobs:
         environment: main
         timeout-minutes: 60
         permissions:
-            action: read
+            actions: read
             id-token: write
-            content: read
+            contents : read
         runs-on: ubuntu-latest
         strategy:
             matrix:
