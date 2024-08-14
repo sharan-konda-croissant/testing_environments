@@ -79,6 +79,5 @@ jobs:
                   path: Readme.md
 
             - name: Upload Screenshots to S3
-              env:
               run: |
                 cat sample.txt
