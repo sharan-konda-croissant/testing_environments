@@ -1,0 +1,89 @@
+name: Run Playwright Tests - Web Main
+on:
+    pull_request:
+        types: [opened, synchronize, reopened]
+        branches:
+            - main
+        paths:
+            - '.github/workflows/web-main.yml'
+jobs:
+    test_and_report:
+        name: Test and Report
+        environment: main
+        timeout-minutes: 60
+        permissions:
+            pull-requests: write
+            id-token: write
+            contents: write
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x]
+        env:
+            CI: true
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+            
+            - name: Generate a sample file
+              run: echo "Hello Sharan Reddy" > sample.txt
+
+            - name: Generate Test Reports Artifact
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: test-report
+                  path: sample.txt
+                  retention-days: 1
+    
+    # manual_approval:
+
+    #     name: Request Manual Approval
+    #     runs-on: ubuntu-latest
+    #     permissions:
+    #         issues: write
+    #         id-token: write
+    #         contents: read
+    #     needs: test_and_report
+    #     steps:
+    #         - name: Awaiting Manual Approval
+    #           uses: trstringer/manual-approval@v1.9.1
+    #           timeout-minutes: 30
+    #           with:
+    #             secret: ${{ github.TOKEN }}
+    #             approvers: sharan-konda-croissant
+    #             minimum-approvals: 1
+    #             issue-title: "Pushing Screenshots to S3"
+    #             issue-body: "Please approve or deny the deployment to push the baseline screenshot artifact to S3"
+    #             exclude-workflow-initiator-as-approver: false
+    
+    upload_to_s3:
+        name: Upload to S3
+        needs: test_and_report
+        environment: main
+        timeout-minutes: 60
+        permissions:
+            actions: read
+            id-token: write
+            contents : read
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [18.x]
+        env:
+            CI: true
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+            
+            - name: Download Web Snapshots Artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: test-report
+                  path: ./
+
+            - name: Upload Screenshots to S3
+              run: |
+                cat sample.txt
