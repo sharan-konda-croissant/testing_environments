@@ -60,7 +60,7 @@ jobs:
     
     upload_to_s3:
         name: Upload to S3
-        needs: manual_approval
+        needs: test_and_report
         environment: main
         timeout-minutes: 60
         permissions:
